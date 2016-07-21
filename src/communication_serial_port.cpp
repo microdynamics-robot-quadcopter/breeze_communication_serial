@@ -50,7 +50,7 @@ namespace communication_serial {
 CommunicationSerialPort::CommunicationSerialPort(void) :
     CommunicationPort("serial:///dev/ttyUSB0")
 {
-    serial_param_.serial_port_ = "/dev/ttyUSB0";
+    serial_param_.port_ = "/dev/ttyUSB0";
 
     if (!initializeSerialPort()) {
         std::cerr << "Serial port initialize unsuccessfully!" << std::endl;
@@ -70,9 +70,9 @@ CommunicationSerialPort::CommunicationSerialPort(std::string serial_url) :
         return ;
     }
 
-    serial_param_.serial_port_ = comm_url_.substr(comm_url_.find("://") + 3,
-                                                  comm_url_.length() -
-                                                  comm_url_.find("://"));
+    serial_param_.port_ = comm_url_.substr(comm_url_.find("://") + 3,
+                                           comm_url_.length() -
+                                           comm_url_.find("://"));
 
     if (!initializeSerialPort()) {
         std::cerr << "Serial port initialize unsuccessfully!" << std::endl;
@@ -98,11 +98,11 @@ Buffer CommunicationSerialPort::readBuffer(void)
     return data;
 }
 
-void CommunicationSerialPort::writeBuffer(Buffer &buffer)
+void CommunicationSerialPort::writeBuffer(Buffer &data)
 {
     boost::mutex::scoped_lock lock(mutex_write_);
 
-    buffer_write_.push(buffer);
+    buffer_write_.push(data);
     startOneWrite();
 }
 
@@ -110,7 +110,7 @@ void CommunicationSerialPort::startOneRead(void)
 {
     boost::mutex::scoped_lock lock(mutex_port_);
 
-    port_->async_read_some(
+    serial_port_->async_read_some(
         boost::asio::buffer(buffer_temp_),
         boost::bind(&CommunicationSerialPort::runReadHandler, this,
                     boost::asio::placeholders::error,
@@ -122,7 +122,7 @@ void CommunicationSerialPort::startOneWrite(void)
     boost::mutex::scoped_lock lock(mutex_port_);
 
     if (!buffer_write_.empty()) {
-        boost::asio::async_write(*port_,
+        boost::asio::async_write(*serial_port_,
                                  boost::asio::buffer(buffer_write_.front()),
                                  boost::bind(
                                      &CommunicationSerialPort::runWriteHandler,
@@ -172,20 +172,20 @@ void CommunicationSerialPort::runWriteHandler(
 bool CommunicationSerialPort::initializeSerialPort(void)
 {
     try {
-        port_ = boost::make_shared<boost::asio::serial_port>(
-                    boost::ref(*io_service_), serial_param_.serial_port_);
-        port_->set_option(boost::asio::serial_port::baud_rate(
-            serial_param_.serial_baud_rate_));
-        port_->set_option(boost::asio::serial_port::flow_control(
+        serial_port_ = boost::make_shared<boost::asio::serial_port>(
+             boost::ref(*io_service_), serial_param_.port_);
+        serial_port_->set_option(boost::asio::serial_port::baud_rate(
+            serial_param_.baud_rate_));
+        serial_port_->set_option(boost::asio::serial_port::flow_control(
             (boost::asio::serial_port::flow_control::type)
-            serial_param_.serial_flow_control_));
-        port_->set_option(boost::asio::serial_port::parity(
+            serial_param_.flow_control_));
+        serial_port_->set_option(boost::asio::serial_port::parity(
             (boost::asio::serial_port::parity::type)
-            serial_param_.serial_parity_));
-        port_->set_option(boost::asio::serial_port::stop_bits(
+            serial_param_.parity_));
+        serial_port_->set_option(boost::asio::serial_port::stop_bits(
             (boost::asio::serial_port::stop_bits::type)
-            serial_param_.serial_stop_bits_));
-        port_->set_option(boost::asio::serial_port::character_size(8));
+            serial_param_.stop_bits_));
+        serial_port_->set_option(boost::asio::serial_port::character_size(8));
     }
     catch(std::exception &exce) {
         std::cerr << "Open the serial port unsuccessfully!" << std::endl;
@@ -211,7 +211,7 @@ bool CommunicationSerialPort::initializeSerialPort(void)
 
 }
 
-#if !COMMUNICATION_LIB
+#if !COMMUNICATION_SERIAL_PORT_LIB
 int main(void)
 {
     return 0;

@@ -55,7 +55,7 @@
 
 namespace communication_serial {
 
-typedef std::vector<u_int8_t> Buffer;
+typedef std::vector<u_int8_t>                      Buffer;
 typedef boost::shared_ptr<boost::asio::io_service> IO;
 
 class CommunicationPort
@@ -63,7 +63,7 @@ class CommunicationPort
 public:
     CommunicationPort(std::string comm_url);
     virtual Buffer readBuffer(void) = 0;
-    virtual void writeBuffer(Buffer &buffer) = 0;
+    virtual void writeBuffer(Buffer &data) = 0;
     bool getFlagInit(void);
     IO getIOInstance(void);
 protected:

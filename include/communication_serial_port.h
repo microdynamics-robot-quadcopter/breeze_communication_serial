@@ -48,11 +48,11 @@
 #include "communication_port.h"
 #include "communication_serial_param.h"
 
-#define COMMUNICATION_LIB 0
+#define COMMUNICATION_SERIAL_PORT_LIB 1
 
 namespace communication_serial {
 
-typedef boost::shared_ptr<boost::asio::serial_port> Port;
+typedef boost::shared_ptr<boost::asio::serial_port> SerialPort;
 
 class CommunicationSerialPort : public CommunicationPort
 {
@@ -60,7 +60,7 @@ public:
     CommunicationSerialPort(void);
     CommunicationSerialPort(std::string serial_url);
     Buffer readBuffer(void);
-    void writeBuffer(Buffer &buffer);
+    void writeBuffer(Buffer &data);
 private:
     void startOneRead(void);
     void startOneWrite(void);
@@ -76,7 +76,7 @@ private:
     boost::mutex             mutex_read_;
     boost::mutex             mutex_write_;
     CommunicationSerialParam serial_param_;
-    Port                     port_;
+    SerialPort               serial_port_;
 };
 
 }
