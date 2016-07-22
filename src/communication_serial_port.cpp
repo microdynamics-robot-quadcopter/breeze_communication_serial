@@ -189,7 +189,8 @@ bool CommunicationSerialPort::initializeSerialPort(void)
     }
     catch(std::exception &exce) {
         std::cerr << "Failed to open serial port!" << std::endl;
-        std::cerr << "Error information: " << exce.what() << std::endl;
+        std::cerr << "Error information: " << "(" << exce.what() << ")"
+                  << std::endl;
         return false;
     }
 
@@ -202,7 +203,8 @@ bool CommunicationSerialPort::initializeSerialPort(void)
     }
     catch (std::exception &exce) {
         std::cerr << "Failed to create serial port thread!" << std::endl;
-        std::cerr << "Error information: " << exce.what() << std::endl;
+        std::cerr << "Error information: " << "(" << exce.what() << ")"
+                  << std::endl;
         return false;
     }
 
