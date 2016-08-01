@@ -13,6 +13,7 @@ add_executable(
     ${COMMUNICATION_LINK_LIB}/src/communication_link.cpp
     ${COMMUNICATION_LINK_LIB}/src/communication_data_type.cpp
 )
+
 target_link_libraries(
     breeze_communication_serial
     ${Boost_LIBRARIES}
